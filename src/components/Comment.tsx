@@ -19,7 +19,7 @@ import {
 import EditIcon from '@/icons/edit'
 import QuesIcon from '@/icons/ques'
 
-export interface CommentProps {}
+export interface CommentProps { }
 
 const Icons = {
   GB: GoodForBlack,
@@ -48,11 +48,10 @@ const CommentAnno = ({ label, value, name, id, isChecked, onChange }) => {
       />
       <label for={id} className="flex items-center cursor-pointer">
         <div
-          className={`flex items-center w-full h-8 whitespace-pre rounded pl-0.5 pr-2 ${
-            isChecked
+          className={`flex items-center w-full h-8 whitespace-pre rounded pl-0.5 pr-2 ${isChecked
               ? 'bg-[hsl(var(--accent-h),var(--accent-s),96%)] dark:bg-[hsl(var(--accent-h),var(--accent-s),12%)] font-semibold'
               : 'hover:bg-[rgba(0,0,0,0.08)] dark:hover:bg-[rgba(255,255,255,0.08)]'
-          }`}
+            }`}
         >
           <div className="flex items-center w-3 h-3 m-2.5">
             <Icon />
@@ -125,17 +124,33 @@ const CommentTitle = () => {
             isPlainInterpretation ? (
               moveInterpretation.value
             ) : (
-              <>
                 {moveInterpretation.value.patternName}
                 {moveInterpretation.value.url ? (
-                  <a
-                    href={moveInterpretation.value.url}
-                    className="inline-block w-3 ml-1 text-[var(--text-faint)] hover:text-[var(--text-accent)] transition"
-                    target="_blank"
+                  <span
+                    className="inline-block w-3 ml-1 text-[var(--text-faint)] hover:text-[var(--text-accent)] transition cursor-pointer"
                     title={t('VIEW_IN_SENSEI')}
+                    onClick={async (e) => {
+                      e.preventDefault()
+                      if (!store.obApp) return
+                      const app = store.obApp.value
+                      const patternName = moveInterpretation.value.patternName
+                      const filename = `${patternName}.md`
+                      let file = app.metadataCache.getFirstLinkpathDest(filename, '')
+                      if (!file) {
+                        try {
+                          file = await app.vault.create(filename, '')
+                        } catch (err) {
+                          console.error('Error creating file', err)
+                          return
+                        }
+                      }
+                      if (file) {
+                        app.workspace.getLeaf().openFile(file)
+                      }
+                    }}
                   >
                     <QuesIcon />
-                  </a>
+                  </span>
                 ) : null}
               </>
             )
@@ -152,7 +167,7 @@ const CommentTitle = () => {
           </div>
         </button>
       </div>
-    </div>
+    </div >
   )
 }
 
