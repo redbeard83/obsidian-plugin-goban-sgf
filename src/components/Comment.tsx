@@ -49,8 +49,8 @@ const CommentAnno = ({ label, value, name, id, isChecked, onChange }) => {
       <label for={id} className="flex items-center cursor-pointer">
         <div
           className={`flex items-center w-full h-8 whitespace-pre rounded pl-0.5 pr-2 ${isChecked
-              ? 'bg-[hsl(var(--accent-h),var(--accent-s),96%)] dark:bg-[hsl(var(--accent-h),var(--accent-s),12%)] font-semibold'
-              : 'hover:bg-[rgba(0,0,0,0.08)] dark:hover:bg-[rgba(255,255,255,0.08)]'
+            ? 'bg-[hsl(var(--accent-h),var(--accent-s),96%)] dark:bg-[hsl(var(--accent-h),var(--accent-s),12%)] font-semibold'
+            : 'hover:bg-[rgba(0,0,0,0.08)] dark:hover:bg-[rgba(255,255,255,0.08)]'
             }`}
         >
           <div className="flex items-center w-3 h-3 m-2.5">
@@ -121,43 +121,60 @@ const CommentTitle = () => {
           {curNodeCommentTitle.value ? (
             typographer(curNodeCommentTitle.value)
           ) : hasMoveInterpretation ? (
-            isPlainInterpretation ? (
-              moveInterpretation.value
-            ) : (
-                {moveInterpretation.value.patternName}
-                {moveInterpretation.value.url ? (
-                  <span
-                    className="inline-block w-3 ml-1 text-[var(--text-faint)] hover:text-[var(--text-accent)] transition cursor-pointer"
-                    title={t('VIEW_IN_SENSEI')}
-                    onClick={async (e) => {
-                      e.preventDefault()
-                      if (!store.obApp) return
+            <>
+              {isPlainInterpretation ? (
+                moveInterpretation.value
+              ) : (
+                moveInterpretation.value.patternName
+              )}
+              {moveInterpretation.value.url ? (
+                <span
+                  className="inline-block w-3 ml-1 text-[var(--text-faint)] hover:text-[var(--text-accent)] transition cursor-pointer"
+                  title={t('OPEN_NOTE')}
+                  onMouseEnter={(e) => {
+                    if (e.ctrlKey && store.obApp) {
                       const app = store.obApp.value
                       const patternName = moveInterpretation.value.patternName
                       const filename = `${patternName}.md`
                       let file = app.metadataCache.getFirstLinkpathDest(filename, '')
-                      if (!file) {
-                        try {
-                          file = await app.vault.create(filename, '')
-                        } catch (err) {
-                          console.error('Error creating file', err)
-                          return
-                        }
-                      }
                       if (file) {
-                        app.workspace.getLeaf().openFile(file)
+                        app.workspace.trigger('hover-link', {
+                          event: e,
+                          source: 'goban-sgf',
+                          hoverParent: e.target,
+                          targetEl: e.target,
+                          linktext: file.path,
+                        })
                       }
-                    }}
-                  >
-                    <QuesIcon />
-                  </span>
-                ) : null}
-              </>
-            )
+                    }
+                  }}
+                  onClick={async (e) => {
+                    e.preventDefault()
+                    if (!store.obApp) return
+                    const app = store.obApp.value
+                    const patternName = moveInterpretation.value.patternName
+                    const filename = `${patternName}.md`
+                    let file = app.metadataCache.getFirstLinkpathDest(filename, '')
+                    if (!file) {
+                      try {
+                        file = await app.vault.create(filename, '')
+                      } catch (err) {
+                        console.error('Error creating file', err)
+                        return
+                      }
+                    }
+                    if (file) {
+                      app.workspace.getLeaf('tab').openFile(file)
+                    }
+                  }}
+                >
+                  <QuesIcon />
+                </span>
+              ) : null}
+            </>
           ) : null}
         </div>
-      </div>
-      <div className="ml-2 shrink-0">
+      </div><div className="ml-2 shrink-0">
         <button
           className="relative z-20 rounded shrink-0 h-8 w-8 p-0 flex items-center justify-center text-[var(--text-muted)] bg-transparent transition shadow-none outline-none hover:bg-[var(--interactive-accent-hover)] hover:text-[var(--text-on-accent)] active:scale-90 border-none cursor-pointer"
           onClick={handleEditButtonClick}
@@ -167,7 +184,7 @@ const CommentTitle = () => {
           </div>
         </button>
       </div>
-    </div >
+    </div>
   )
 }
 

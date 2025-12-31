@@ -158,5 +158,6 @@ export default {
   BM_CONNECT: 'Connect',
   BM_TENGEN: 'Tengen',
   BM_HOSHI: 'Hoshi',
-  VIEW_IN_SENSEI: 'View article on Sensei’s Library'
+  VIEW_IN_SENSEI: 'View article on Sensei’s Library',
+  OPEN_NOTE: 'Open note',
 }
