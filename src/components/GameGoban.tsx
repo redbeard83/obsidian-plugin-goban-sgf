@@ -6,7 +6,8 @@ import { Focus } from '@/icons/annos'
 import { t } from '@/lang/helper'
 import { Prev, Next } from '@/icons/navs'
 import { debounce } from 'obsidian'
-import { goStep, clickVertex } from '@/store/actions'
+import { goStep, clickVertex, toggleDeadStone, startScoring } from '@/store/actions'
+import { stringifyVertex, parseVertex } from '@sabaki/sgf'
 
 export interface GameGobanProps { }
 
@@ -32,6 +33,9 @@ const GameGoban = () => {
     gobanRange,
     gameInfo,
     showCoordinates,
+    scoringMode,
+    deadStones,
+    territoryMap,
   } = store
 
   const [step, setStep] = useState(curStep.value || 0)
@@ -56,6 +60,10 @@ const GameGoban = () => {
   const handling = useRef(false)
   const handleVertexClick = async (e, vertex) => {
     if (handling.current) {
+      return
+    }
+    if (scoringMode.value) {
+      toggleDeadStone(store, vertex)
       return
     }
     try {
@@ -87,7 +95,51 @@ const GameGoban = () => {
     s = Math.min(vBasedW, vBasedH)
 
     return s
-  }, [width, height, gobanRange, gameInfo, showCoordinates.value])
+    return s
+  }, [width, height, gobanRange, gameInfo, showCoordinates.value, scoringMode.value])
+
+  const displaySignMap = useMemo(() => {
+    // In scoring mode, we don't remove stones from signMap
+    // We just dim them using dimmedVertices
+    return signMap.value
+  }, [signMap.value])
+
+  const displayDimmedVertices = useMemo(() => {
+    if (!scoringMode.value) return []
+    return [...deadStones.value].map(v => {
+      // stringifyVertex returns coordinates "A1", need to parse back to vertices?
+      // Wait, stringifyVertex returns "aa", "ab" etc or "A1"?
+      // @sabaki/sgf stringifyVertex uses SGF coordinates (aa, ab).
+      // Shudan expects [x, y] vertices for dimmedVertices.
+      // We need to check what `deadStones` contains.
+      // In actions.ts, `deadSet.add(stringifyVertex(v))`.
+      // So we need to parse it back. (Wait, parseVertex is available?)
+      // We can just store [x,y] in deadStones but Sets need primitives. 
+      // We can use helper in GameGoban or better: import parseVertex.
+      // Or just map it.
+      return parseVertex(v)
+    })
+  }, [scoringMode.value, deadStones.value])
+
+  const displayPaintMap = useMemo(() => {
+    if (!scoringMode.value || !territoryMap.value) return undefined
+
+    // territoryMap is [][] of signs (0, 1, -1)
+    // paintMap expects Map<0|1|-1> (2D array in shudan terms usually)
+    // Goban.d.ts says `paintMap?: Map<0 | 1 | -1>;`
+    // Shudan's `Map` type is likely `T[][]`.
+    return territoryMap.value
+  }, [scoringMode.value, territoryMap.value])
+
+  const displayGhostStoneMap = useMemo(() => {
+    // No ghost stones map manipulation for scoring needed anymore
+    return ghostStoneMap.value
+  }, [ghostStoneMap.value])
+
+  const displayMarkerMap = useMemo(() => {
+    // Only use markerMap for actual markers, not territory points
+    return markerMap.value
+  }, [markerMap.value])
 
   return (
     <div className="relative flex flex-col items-center w-full h-full grow">
@@ -112,9 +164,11 @@ const GameGoban = () => {
               <div class="h-full w-full relative z-10 flex justify-center items-center">
                 <SabakiGoban
                   vertexSize={vSize}
-                  signMap={signMap.value}
-                  markerMap={markerMap.value}
-                  ghostStoneMap={ghostStoneMap.value}
+                  signMap={displaySignMap}
+                  markerMap={displayMarkerMap}
+                  ghostStoneMap={displayGhostStoneMap}
+                  paintMap={displayPaintMap}
+                  dimmedVertices={displayDimmedVertices}
                   showCoordinates={showCoordinates.value}
                   animateStonePlacement={clicked}
                   rangeX={(gobanRange.value?.x as [number, number]) || undefined}

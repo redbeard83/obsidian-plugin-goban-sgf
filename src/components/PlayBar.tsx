@@ -1,18 +1,18 @@
 import { useContext } from 'preact/hooks'
 import { GobanContext } from '@/store/store'
 import { t } from '@/lang/helper'
-import { setPlayer, setMode, makeResign, makeMove } from '@/store/actions'
+import { setPlayer, setMode, makeResign, makeMove, startScoring, stopScoring } from '@/store/actions'
 import InfoIcon from '@/icons/info'
 import MarkIcon from '@/icons/mark'
 import ResignIcon from '@/icons/resign'
 import SkipIcon from '@/icons/skip'
 import Tooltip from '@/components/Tooltip'
 
-export interface PlayBarProps {}
+export interface PlayBarProps { }
 
 const PlayBar = () => {
   const store = useContext(GobanContext)
-  const { gameInfo, curPlayer, playerCaptures, curTreePositionNodeID } = store
+  const { gameInfo, curPlayer, playerCaptures, curTreePositionNodeID, scoringMode, scoreEstimate } = store
 
   const handleClickCurrentPlayer = () => {
     setPlayer(store, curTreePositionNodeID.value, -curPlayer)
@@ -34,15 +34,48 @@ const PlayBar = () => {
     makeMove(store, [-1, -1], { player: p })
   }
 
+  const handleScore = () => {
+    if (scoringMode.value) {
+      stopScoring(store)
+    } else {
+      startScoring(store)
+    }
+  }
+
+  if (scoringMode.value) {
+    let scoreText = 'Estimating...'
+    if (scoreEstimate.value) {
+      const { black, white, komi } = scoreEstimate.value
+      const diff = black - white
+      const winner = diff > 0 ? 'Black' : 'White'
+      scoreText = `B: ${black} | W: ${white} (Komi: ${komi}) | ${winner} +${Math.abs(diff)}`
+    }
+
+    return (
+      <div className="relative h-8 shrink-0 flex items-center justify-between w-full grow flex-nowrap text-[var(--text-normal)]">
+        <div className="flex items-center px-4 font-bold text-sm">
+          {scoreText}
+        </div>
+        <div className="flex items-center justify-end">
+          <button
+            class="rounded h-8 px-3 flex items-center justify-center text-[var(--text-on-accent)] bg-[var(--interactive-accent)] transition shadow-none outline-none border-none cursor-pointer hover:bg-[var(--interactive-accent-hover)] active:scale-90"
+            onClick={handleScore}
+          >
+            Stop Scoring
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="relative h-8 shrink-0 flex items-center justify-between w-full grow flex-nowrap text-[var(--text-normal)]">
       <div className="w-18"></div>
 
       <div className="flex items-center justify-center">
         <div
-          className={`mr-4 flex items-center justify-end transition ${
-            curPlayer.value < 0 ? 'opacity-20' : 'opacity-100'
-          }`}
+          className={`mr-4 flex items-center justify-end transition ${curPlayer.value < 0 ? 'opacity-20' : 'opacity-100'
+            }`}
         >
           <Tooltip message={t('RESIGN')} placement="top-begin">
             <button
@@ -70,9 +103,8 @@ const PlayBar = () => {
         </div>
         <div className="flex items-center shrink-0">
           <div
-            className={`rounded-[24px] opacity-0 h-4 w-4 bg-[rgba(0,0,0,0.3)] dark:bg-[rgba(255,255,255,0.3)] flex items-center justify-center text-xs font-medium ${
-              playerCaptures.value?.[0] ? 'opacity-70' : ''
-            }`}
+            className={`rounded-[24px] opacity-0 h-4 w-4 bg-[rgba(0,0,0,0.3)] dark:bg-[rgba(255,255,255,0.3)] flex items-center justify-center text-xs font-medium ${playerCaptures.value?.[0] ? 'opacity-70' : ''
+              }`}
           >
             {playerCaptures.value?.[0]}
           </div>
@@ -91,9 +123,8 @@ const PlayBar = () => {
         >
           <div className="relative w-[34px] h-[22px]">
             <div
-              className={`absolute left-0 top-0 bottom-0 w-[22px] rounded-[24px] border-2 border-transparent dark:border-white bg-black ${
-                curPlayer.value < 0 ? 'z-10' : 'z-30'
-              }`}
+              className={`absolute left-0 top-0 bottom-0 w-[22px] rounded-[24px] border-2 border-transparent dark:border-white bg-black ${curPlayer.value < 0 ? 'z-10' : 'z-30'
+                }`}
             ></div>
             <div
               className={`absolute z-20 right-0 top-0 bottom-0 w-[22px] rounded-[24px] border-2 border-black dark:border-transparent bg-white`}
@@ -110,17 +141,15 @@ const PlayBar = () => {
             </div>
           ) : null}
           <div
-            className={`ml-2 rounded-[24px] opacity-0 h-4 w-4 bg-[rgba(0,0,0,0.3)] dark:bg-[rgba(255,255,255,0.3)] text-[var(--text-normal)] flex items-center justify-center text-xs font-medium ${
-              playerCaptures.value?.[1] ? 'opacity-70' : ''
-            }`}
+            className={`ml-2 rounded-[24px] opacity-0 h-4 w-4 bg-[rgba(0,0,0,0.3)] dark:bg-[rgba(255,255,255,0.3)] text-[var(--text-normal)] flex items-center justify-center text-xs font-medium ${playerCaptures.value?.[1] ? 'opacity-70' : ''
+              }`}
           >
             {playerCaptures.value?.[1]}
           </div>
         </div>
         <div
-          className={`ml-4 flex items-center transition ${
-            curPlayer.value < 0 ? 'opacity-100' : 'opacity-20'
-          }`}
+          className={`ml-4 flex items-center transition ${curPlayer.value < 0 ? 'opacity-100' : 'opacity-20'
+            }`}
         >
           <div className="h-4 w-[1px] bg-[var(--background-modifier-border)] mr-2"></div>
           <Tooltip message={t('SKIP')} placement="top-end">
@@ -167,6 +196,15 @@ const PlayBar = () => {
             <div class="w-4 h-4">
               <MarkIcon />
             </div>
+          </button>
+        </Tooltip>
+
+        <Tooltip message="Estimate Score" placement="top-end">
+          <button
+            class="rounded shrink-0 h-8 w-8 p-0 flex items-center justify-center text-[var(--text-muted)] bg-transparent transition shadow-none outline-none border-none cursor-pointer hover:bg-[var(--interactive-accent)] hover:text-[var(--text-on-accent)] ml-2 active:scale-90"
+            onClick={handleScore}
+          >
+            <div class="text-xs font-bold">SC</div>
           </button>
         </Tooltip>
       </div>

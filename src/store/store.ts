@@ -211,6 +211,12 @@ export const createStore = (
 
   const gameTreesHashs = computed(() => gameTrees.value.map((gt) => gt.getHash()).join(','))
 
+  // Scoring
+  const scoringMode = signal(false)
+  const deadStones = signal<Set<string>>(new Set())
+  const territoryMap = signal<any[][] | null>(null)
+  const scoreEstimate = signal<any>(null)
+
   return {
     id,
     view,
@@ -253,6 +259,10 @@ export const createStore = (
     settings,
     markdownGobanHeight: computed(() => settings.value.markdownGobanHeight),
     markdownGobanWidth: computed(() => settings.value.markdownGobanWidth),
+    scoringMode,
+    deadStones,
+    territoryMap,
+    scoreEstimate,
   }
 }
 

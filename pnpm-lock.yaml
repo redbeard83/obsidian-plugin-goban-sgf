@@ -14,6 +14,9 @@ importers:
       '@sabaki/boardmatcher':
         specifier: ^1.3.0
         version: 1.3.0
+      '@sabaki/deadstones':
+        specifier: ^2.1.2
+        version: 2.1.2
       '@sabaki/go-board':
         specifier: ^1.4.3
         version: 1.4.3
@@ -430,6 +433,9 @@ packages:
 
   '@sabaki/boardmatcher@1.3.0':
     resolution: {integrity: sha512-Wvw/p/cUmmmi18bOER4Mu9Bt6dShXVsdZkA4UiTBthsPzvUbtmzHNykEYpxiLog/ToLOcS1C+KfWyxrJ0wGZKg==}
+
+  '@sabaki/deadstones@2.1.2':
+    resolution: {integrity: sha512-C2lmvm6VEFwZwRd8rNSYxVikVXCBmy3MYsC6ZdmexEuH3q9Ha/oKfGSZEczI3kZLz/64vZ7s2ST/wJHpR193lQ==}
 
   '@sabaki/go-board@1.4.3':
     resolution: {integrity: sha512-tXonP7vw7bYcXKSVrN1bhkb/QQi5EfTbDSflBffSp2iabbFbz4JyhEyw0ekbuwR0ntBq6iHky6BfCGF69Z4ttg==}
@@ -2089,6 +2095,8 @@ snapshots:
       picomatch: 2.3.1
 
   '@sabaki/boardmatcher@1.3.0': {}
+
+  '@sabaki/deadstones@2.1.2': {}
 
   '@sabaki/go-board@1.4.3': {}
 

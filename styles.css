@@ -1247,6 +1247,9 @@
     font-size: 0.75rem;
     line-height: 1rem;
 }
+.goban-sgf-plugin-container .font-bold {
+    font-weight: 700;
+}
 .goban-sgf-plugin-container .font-medium {
     font-weight: 500;
 }

@@ -252,7 +252,20 @@ export const DisplaySetting: WithFinishFC<DisplaySettingProps> = ({ onFinish, in
                 </select>
               </div>
             </div>
-
+            <div className="mb-4">
+              <div className="mb-1 px-0.5">{t('SHOW_COORDINATES')}</div>
+              <div className="flex items-center w-28">
+                <select
+                  value={d.showCoordinates}
+                  onChange={(e) => handleSelectChange(e, 'showCoordinates')}
+                  className="w-full shadow-none border-solid border border-[var(--background-modifier-border)]"
+                >
+                  {BoolSelectOptions.map((it) => (
+                    <option value={it.value}>{it.label}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
             <div className="mb-4">
               <div className="mb-1 px-0.5">{t('SHOW_LATS_MOVES')}</div>
               <div className="flex items-center w-28">
