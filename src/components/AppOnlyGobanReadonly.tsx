@@ -10,13 +10,18 @@ export interface GobanProps {
 
 const AppOnlyGobanReadonly = ({ store }: GobanProps) => {
   const [mref, { width }] = useMeasure()
+  const { markdownGobanHeight, markdownGobanWidth } = store
+
   const calcH = useMemo(() => {
+    if (markdownGobanHeight.value && markdownGobanHeight.value !== 'auto') {
+      return markdownGobanHeight.value
+    }
     return width ? width + 48 : 0
-  }, [width])
+  }, [width, markdownGobanHeight.value])
 
   return (
     <GobanContext.Provider value={store}>
-      <div ref={mref} className="w-full">
+      <div ref={mref} className="w-full" style={{ width: markdownGobanWidth.value }}>
         {width && calcH ? (
           <div
             className="w-full rounded bg-[var(--background-primary-alt)] game-goban-readonly"

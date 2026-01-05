@@ -18,6 +18,10 @@ export interface GobanSGFPluginSettings {
   dftKomi: number
   dftHandicap: number
   dftSize: number
+  markdownGobanHeight: string
+  markdownGobanWidth: string
+  markdownShowBackground: boolean
+  dftShowCoordinates: boolean
 }
 
 export const DEFAULT_SETTINGS: GobanSGFPluginSettings = {
@@ -30,6 +34,10 @@ export const DEFAULT_SETTINGS: GobanSGFPluginSettings = {
   dftKomi: 5.5,
   dftHandicap: 0,
   dftSize: 19,
+  markdownGobanHeight: 'auto',
+  markdownGobanWidth: '100%',
+  dftShowCoordinates: false,
+  markdownShowBackground: false
 }
 
 export interface GobanSGFPluginFrontmatterSettings {
@@ -38,6 +46,7 @@ export interface GobanSGFPluginFrontmatterSettings {
   showNextMoves?: boolean | null
   showSiblings?: boolean | null
   showMoveNumbers?: boolean | null
+  showCoordinates?: boolean | null
   showLastMoves?: number
   gobanRange?: string // like: JSON.stringify({ x: [0, 18], y: [0, 18] })
   initMode?: 'play' | 'edit'
@@ -45,6 +54,8 @@ export interface GobanSGFPluginFrontmatterSettings {
   komi?: number
   handicap?: number
   size?: number
+  gobanHeight?: string
+  gobanWidth?: string
   [key: string]: any
 }
 
@@ -55,6 +66,7 @@ export interface FinalSettings {
   showNextMoves: boolean
   showSiblings: boolean
   showMoveNumbers: boolean
+  showCoordinates: boolean
   showLastMoves: number
   gobanRange: {
     x: [number, number]
@@ -65,6 +77,8 @@ export interface FinalSettings {
   komi: number
   handicap: number
   size: number
+  markdownGobanHeight: string
+  markdownGobanWidth: string
 }
 
 export const mergeSettings = (
@@ -78,6 +92,7 @@ export const mergeSettings = (
     showNextMoves: pl.dftShowNextMoves,
     showSiblings: pl.dftShowSiblings,
     showMoveNumbers: pl.dftShowMoveNumbers,
+    showCoordinates: pl.dftShowCoordinates,
     showLastMoves: 0,
     gobanRange: {
       x: [0, pl.dftSize - 1],
@@ -88,6 +103,8 @@ export const mergeSettings = (
     komi: pl.dftKomi,
     handicap: pl.dftHandicap,
     size: pl.dftSize,
+    markdownGobanHeight: pl.markdownGobanHeight,
+    markdownGobanWidth: pl.markdownGobanWidth,
   }
 
   if (
@@ -118,8 +135,8 @@ export const mergeSettings = (
               ? 0
               : res.size - 1
             : Number(xi) >= res.size
-            ? res.size - 1
-            : Number(xi)
+              ? res.size - 1
+              : Number(xi)
         )
         y = y.map((yi, i) =>
           isNaN(Number(yi))
@@ -127,8 +144,8 @@ export const mergeSettings = (
               ? 0
               : res.size - 1
             : Number(yi) >= res.size
-            ? res.size - 1
-            : Number(yi)
+              ? res.size - 1
+              : Number(yi)
         )
         res.gobanRange = { x: x[0] > x[1] ? [x[1], x[0]] : x, y: y[0] > y[1] ? [y[1], y[0]] : y }
       } catch (e) {
@@ -144,6 +161,7 @@ export const mergeSettings = (
         'showNextMoves',
         'showSiblings',
         'showMoveNumbers',
+        'showCoordinates',
       ].includes(k)
     ) {
       res[k] = convertBool(pa[k])
@@ -172,6 +190,10 @@ export const mergeSettings = (
       res.initMode = pa[k]
     } else if (k === 'initCommentMode' && ['view', 'edit'].includes(pa[k])) {
       res.initCommentMode = pa[k]
+    } else if (k === 'gobanHeight') {
+      res.markdownGobanHeight = pa[k]
+    } else if (k === 'gobanWidth') {
+      res.markdownGobanWidth = pa[k]
     } else if (res[k] === undefined) {
       res[k] = pa[k]
     }

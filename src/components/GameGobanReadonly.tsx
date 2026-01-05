@@ -8,7 +8,7 @@ import { Prev, Next } from '@/icons/navs'
 import { debounce } from 'obsidian'
 import { goStep } from '@/store/actions'
 
-export interface GameGobanReadonlyProps {}
+export interface GameGobanReadonlyProps { }
 
 const debounceSetStep = debounce((v: number, store: any, curStep: any) => {
   const st = Number(v) - curStep.value
@@ -31,6 +31,7 @@ const GameGobanReadonly = () => {
     totalSteps,
     gobanRange,
     gameInfo,
+    showCoordinates,
   } = store
 
   const [step, setStep] = useState(curStep.value || 0)
@@ -58,20 +59,20 @@ const GameGobanReadonly = () => {
       : Number(gameInfo.value?.size?.[0])
     const { x = [0, gobanSize - 1], y = [0, gobanSize - 1] } = gobanRange.value || {}
 
-    const vBasedW = Math.floor(width / (x[1] - x[0] + 1 + 2 * 0.25 + 2 * 0.15))
-    const vBasedH = Math.floor(height / (y[1] - y[0] + 1 + 2 * 0.25 + 2 * 0.15))
+    const extra = showCoordinates.value ? 1.5 : 0
+    const vBasedW = Math.floor(width / (x[1] - x[0] + 1 + 2 * 0.25 + 2 * 0.15 + extra))
+    const vBasedH = Math.floor(height / (y[1] - y[0] + 1 + 2 * 0.25 + 2 * 0.15 + extra))
 
     s = Math.min(vBasedW, vBasedH)
 
     return s
-  }, [width, height, gobanRange, gameInfo])
+  }, [width, height, gobanRange, gameInfo, showCoordinates.value])
 
   return (
     <div className="relative z-0 flex flex-col items-center w-full h-full grow">
       <div
-        className={`absolute inset-0 z-0 rounded ${
-          curAnnos.value.isHotspot ? 'border-[3px] border-solid border-[var(--text-accent)]' : ''
-        }`}
+        className={`absolute inset-0 z-0 rounded ${curAnnos.value.isHotspot ? 'border-[3px] border-solid border-[var(--text-accent)]' : ''
+          }`}
       >
         <div className={`relative h-full w-full rounded opacity-50 goban-sgf-app_bg`}></div>
         {curAnnos.value.isHotspot ? (
@@ -93,8 +94,9 @@ const GameGobanReadonly = () => {
                   signMap={signMap.value}
                   markerMap={markerMap.value}
                   ghostStoneMap={ghostStoneMap.value}
-                  rangeX={gobanRange.value?.x || undefined}
-                  rangeY={gobanRange.value?.y || undefined}
+                  showCoordinates={showCoordinates.value}
+                  rangeX={(gobanRange.value?.x as [number, number]) || undefined}
+                  rangeY={(gobanRange.value?.y as [number, number]) || undefined}
                   fuzzyStonePlacement={fuzzyStonePlacement.value}
                   selectedVertices={selectedVertices.value}
                 />
@@ -106,9 +108,8 @@ const GameGobanReadonly = () => {
       {totalSteps.value ? (
         <div className="relative z-20 mb-2 flex items-center shrink-0 w-[80%] group h-10">
           <div
-            className={`shrink-0 p-3 flex justify-center items-center text-[var(--text-muted)] transition hover:text-[var(--text-accent)] ${
-              step > 0 ? 'cursor-pointer' : 'cursor-not-allowed opacity-30'
-            }`}
+            className={`shrink-0 p-3 flex justify-center items-center text-[var(--text-muted)] transition hover:text-[var(--text-accent)] ${step > 0 ? 'cursor-pointer' : 'cursor-not-allowed opacity-30'
+              }`}
             onClick={step > 0 ? () => goStep(store, -1) : undefined}
           >
             <div className="w-4 h-4 origin-center transform scale-75 relative -top-0.5">
@@ -138,9 +139,8 @@ const GameGobanReadonly = () => {
             </div>
           </div>
           <div
-            className={`shrink-0 p-3 flex justify-center items-center text-[var(--text-muted)]  transition hover:text-[var(--text-accent)] ${
-              step < totalSteps.value ? 'cursor-pointer' : 'cursor-not-allowed opacity-30'
-            }`}
+            className={`shrink-0 p-3 flex justify-center items-center text-[var(--text-muted)]  transition hover:text-[var(--text-accent)] ${step < totalSteps.value ? 'cursor-pointer' : 'cursor-not-allowed opacity-30'
+              }`}
             onClick={step === totalSteps.value ? undefined : () => goStep(store, 1)}
           >
             <div className="w-4 h-4 origin-center transform scale-75 relative -top-0.5">

@@ -81,7 +81,21 @@ export const createStore = (
   const board = computed(() =>
     getBoard(curGame?.value, curTreePositionNodeID.value || rootNode?.value?.id || '')
   )
-  const gobanRange = computed(() => settings.value.gobanRange)
+  const gobanRange = computed(() => {
+    // If frontmatter explicitly defines range or size, respect settings (which merges frontmatter)
+    if (frontmatterData.value.gobanRange || frontmatterData.value.size) {
+      return settings.value.gobanRange
+    }
+    // Otherwise, try to infer from SGF game info
+    const sz = gameInfo.value?.size
+    if (sz) {
+      const s = Number(sz[0])
+      if (!isNaN(s)) {
+        return { x: [0, s - 1], y: [0, s - 1] }
+      }
+    }
+    return settings.value.gobanRange
+  })
   const signMap = computed(() => board.value?.signMap)
   const showMoveNumbers = computed(() => settings.value.showMoveNumbers)
   const showLastMoveNumbers = computed(() => settings.value.showLastMoves)
@@ -127,6 +141,7 @@ export const createStore = (
     }
     return markerMap
   })
+  const showCoordinates = computed(() => settings.value.showCoordinates)
   const showNextMoves = computed(() => settings.value.showNextMoves)
   const showSiblings = computed(() => settings.value.showSiblings)
   const ghostStoneMap = computed(() => {
@@ -139,7 +154,7 @@ export const createStore = (
           let [x, y] = v.split(',').map((x) => +x)
           let { sign } = board.value.siblingsInfo[v]
 
-          if (y >=0 && x >=0) {
+          if (y >= 0 && x >= 0) {
             ghostStoneMap[y][x] = { sign, faint: showNextMoves }
           }
         }
@@ -150,7 +165,7 @@ export const createStore = (
           let [x, y] = v.split(',').map((x) => +x)
           let { sign, type } = board.value.childrenInfo[v]
 
-          if (y >=0 && x >=0) {
+          if (y >= 0 && x >= 0) {
             ghostStoneMap[y][x] = { sign, type }
           }
         }
@@ -234,7 +249,10 @@ export const createStore = (
     historyCursor,
     gameTreesHashs,
     gobanRange,
+    showCoordinates,
     settings,
+    markdownGobanHeight: computed(() => settings.value.markdownGobanHeight),
+    markdownGobanWidth: computed(() => settings.value.markdownGobanWidth),
   }
 }
 

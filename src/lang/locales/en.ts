@@ -78,6 +78,7 @@ export default {
   SHOW_SIBLINGS: 'Show other potential point positions for this move',
   SHOW_SIBLINGS_INFO: 'As the previous move is a branching point, there are multiple branches from the previous move to the next move. Enabling this option will display the options for multiple branches.',
   SHOW_MOVE_NUMBER: 'Display move count',
+  SHOW_COORDINATES: 'Show board coordinates',
   SHOW_MOVE_NUMBER_INFO: 'Displaying move numbers will cover the markers on the board, making the editing function unavailable. It is recommended not to enable this by default. If there are multiple game files that need to display move numbers only, you can modify the display settings for specific game files. It is not recommended to set this globally here.',
   SHOW_LATS_MOVES: 'Display last X moves',
   INIT_MODE: 'Default mode on open',

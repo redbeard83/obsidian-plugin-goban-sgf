@@ -57,6 +57,7 @@ export const DisplaySetting: WithFinishFC<DisplaySettingProps> = ({ onFinish, in
     showNextMoves: mapBoolToSelectValue(initData.showNextMoves),
     showSiblings: mapBoolToSelectValue(initData.showSiblings),
     showMoveNumbers: mapBoolToSelectValue(initData.showMoveNumbers),
+    showCoordinates: mapBoolToSelectValue(initData.showCoordinates),
     showLastMoves: convertLastMoves(initData.showLastMoves),
     komi: convertKomi(initData.komi),
     handicap: convertHandicap(initData.handicap),
@@ -71,8 +72,8 @@ export const DisplaySetting: WithFinishFC<DisplaySettingProps> = ({ onFinish, in
       initData.initCommentMode === 'edit'
         ? 'edit'
         : initData.initCommentMode === 'view'
-        ? 'view'
-        : 'inherit',
+          ? 'view'
+          : 'inherit',
   })
 
   const handleConfirm = () => {
@@ -118,6 +119,7 @@ export const DisplaySetting: WithFinishFC<DisplaySettingProps> = ({ onFinish, in
         'showNextMoves',
         'showSiblings',
         'showMoveNumbers',
+        'showCoordinates',
       ].includes(k)) {
         if (d[k] !== 'i') {
           res[k] = d[k] === 'y'
@@ -146,6 +148,7 @@ export const DisplaySetting: WithFinishFC<DisplaySettingProps> = ({ onFinish, in
         'showNextMoves',
         'showSiblings',
         'showMoveNumbers',
+        'showCoordinates',
         'initMode',
         'initCommentMode',
       ].includes(field)

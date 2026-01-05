@@ -78,6 +78,15 @@ export default class GobanSGFSettingsTab extends PluginSettingTab {
           })
       )
 
+    new Setting(containerEl).setName(`${t('SHOW_COORDINATES')}`).addToggle((toggle) =>
+      toggle
+        .setValue(this.plugin.settings.dftShowCoordinates || DEFAULT_SETTINGS.dftShowCoordinates)
+        .onChange((value: boolean) => {
+          this.plugin.settings.dftShowCoordinates = value
+          this.plugin.saveData(this.plugin.settings)
+        })
+    )
+
     new Setting(containerEl)
       .setName(`${t('INIT_KOMI')}`)
       .setDesc(`${t('INIT_KOMI_INFO')}`)
